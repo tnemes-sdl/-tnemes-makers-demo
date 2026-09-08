@@ -62,6 +62,11 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
 - A guess earns a speed bonus on top of its distance score: up to
   `SPEED_BONUS_SHARE` (20%) more, scaling linearly with the seconds left on the
   clock. `RoundResult` carries `baseScore` and `bonus` alongside the total.
+  `speedBonus` takes the round length as an argument and `submitGuess` passes
+  `game.secondsPerRound` — never a constant, or a `?seconds=20` game pays 40% and a
+  `?seconds=5` game pays 10%. `maxScore` is derived from `MAX_DISTANCE_SCORE` plus a
+  full bonus for the same reason: hardcoding the per-round ceiling makes the summary
+  report over 100% of a "perfect game".
 - Round length is configurable: `ROUND_SECONDS` is the default, `createGame`'s third
   argument overrides it, and `?seconds=20` in the URL sets it without a rebuild.
 - Latitude/longitude order is always `(lat, lon)` — matching Leaflet's `LatLng`.

@@ -1,5 +1,5 @@
 import type { City } from './cities';
-import { haversineKm, scoreForDistance, speedBonus } from './geo';
+import { MAX_DISTANCE_SCORE, haversineKm, scoreForDistance, speedBonus } from './geo';
 import type { LatLon } from './geo';
 
 export const ROUNDS_PER_GAME = 10;
@@ -102,7 +102,7 @@ export function submitGuess(
 
   const distanceKm = haversineKm(guess, { lat: actual.lat, lon: actual.lon });
   const baseScore = scoreForDistance(distanceKm);
-  const bonus = speedBonus(baseScore, secondsLeft);
+  const bonus = speedBonus(baseScore, secondsLeft, game.secondsPerRound);
   const result: RoundResult = {
     guess,
     actual,
@@ -147,4 +147,12 @@ export function advanceRound(game: Game): void {
   game.round += 1;
 }
 
-export const maxScore = (game: Game): number => game.targets.length * 1000;
+/**
+ * The best a game can score: a bullseye in every round, each placed instantly.
+ * Derived from the scoring functions rather than hardcoded, so the speed bonus
+ * cannot push a real total past the "perfect game" the summary compares against.
+ */
+export const maxScore = (game: Game): number =>
+  game.targets.length *
+  (MAX_DISTANCE_SCORE +
+    speedBonus(MAX_DISTANCE_SCORE, game.secondsPerRound, game.secondsPerRound));

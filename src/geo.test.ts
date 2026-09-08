@@ -52,23 +52,39 @@ describe('formatDistance', () => {
 
 describe('speedBonus', () => {
   it('is nothing on the buzzer', () => {
-    expect(speedBonus(1000, 0)).toBe(0);
+    expect(speedBonus(1000, 0, 10)).toBe(0);
   });
 
   it('is the full share with the whole clock left', () => {
-    expect(speedBonus(1000, 10)).toBe(200);
+    expect(speedBonus(1000, 10, 10)).toBe(200);
   });
 
   it('scales linearly with the time left', () => {
-    expect(speedBonus(1000, 5)).toBe(100);
-    expect(speedBonus(500, 5)).toBe(50);
+    expect(speedBonus(1000, 5, 10)).toBe(100);
+    expect(speedBonus(500, 5, 10)).toBe(50);
   });
 
   it('never subtracts points', () => {
-    expect(speedBonus(1000, -3)).toBe(0);
+    expect(speedBonus(1000, -3, 10)).toBe(0);
   });
 
   it('is nothing when the round scored nothing', () => {
-    expect(speedBonus(0, 10)).toBe(0);
+    expect(speedBonus(0, 10, 10)).toBe(0);
+  });
+
+  // The share is of the clock actually in play, not of a hardcoded 10 seconds:
+  // half a 20-second round left is worth exactly what half a 10-second round is.
+  it('measures the share against the round length it is given', () => {
+    expect(speedBonus(1000, 20, 20)).toBe(200);
+    expect(speedBonus(1000, 10, 20)).toBe(100);
+    expect(speedBonus(1000, 5, 5)).toBe(200);
+  });
+
+  it('never pays more than the share, however much time is claimed', () => {
+    expect(speedBonus(1000, 40, 10)).toBe(200);
+  });
+
+  it('is nothing when the round has no length', () => {
+    expect(speedBonus(1000, 10, 0)).toBe(0);
   });
 });
