@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm test)",
+      "Bash(npm run typecheck)",
+      "Bash(npm install)"
+    ],
+    "deny": [
+      "Read(.idea/**)",
+      "Edit(.idea/**)"
+    ]
+  }
+}

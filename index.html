@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Where in the World?</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="panel">
+        <div class="prompt">
+          <span class="round" id="round">Ready</span>
+          <h1 id="city">Where in the World?</h1>
+          <p class="hint" id="hint">10 rounds, 10 seconds each.</p>
+        </div>
+        <div class="result" id="result" hidden>
+          <div class="result-item">
+            <span class="result-value" id="result-distance">&mdash;</span>
+            <span class="result-label" id="result-distance-label">away</span>
+          </div>
+          <span class="result-divider"></span>
+          <div class="result-item result-points" id="result-points-item">
+            <span class="result-value" id="result-points">0</span>
+            <span class="result-label" id="result-points-label">points</span>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="stat" id="timer-stat">
+            <span class="stat-label">Time</span>
+            <span class="stat-value timer" id="timer">10s</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Total Score</span>
+            <span class="stat-value score" id="score">0</span>
+          </div>
+          <button id="next" class="is-invisible">Start game</button>
+        </div>
+      </header>
+      <div id="map"></div>
+    </div>
+
+    <dialog id="summary" class="summary" aria-labelledby="summary-title">
+      <div class="summary-card">
+        <h2 class="summary-title" id="summary-title">Game over</h2>
+        <p class="summary-score">
+          <span id="summary-points">0</span
+          ><span class="summary-max" id="summary-max">/ 10,000</span>
+        </p>
+        <div class="summary-bar">
+          <span class="summary-fill" id="summary-fill"></span>
+        </div>
+        <p class="summary-rating" id="summary-rating"></p>
+        <button id="new-game" autofocus>New game</button>
+      </div>
+    </dialog>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
