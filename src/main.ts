@@ -329,6 +329,8 @@ function render(): void {
     showRoundResult(game.pending);
     nextButton.textContent =
       game.round + 1 >= ROUNDS_PER_GAME ? 'See final score' : 'Next round';
+    hintEl.hidden = false;
+    hintEl.textContent = 'Space for the next round.';
     setNextVisible(true);
     mapEl.classList.add('locked');
   }
@@ -364,6 +366,35 @@ nextButton.addEventListener('click', () => {
 });
 
 newGameButton.addEventListener('click', newGame);
+
+/**
+ * Keyboard shortcuts, so a game can be played without reaching for the button
+ * between rounds: Space or Enter does whatever the action button would do, and
+ * N starts a fresh game.
+ */
+document.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key === ' ' || event.key === 'Enter') {
+    if (!game.started) {
+      startGame(game);
+      render();
+      startTimer();
+      return;
+    }
+
+    if (game.pending === null) return; // round still open — the map takes the input
+
+    advanceRound(game);
+    revealLayer.clearLayers();
+    map.setView(WORLD_CENTER, START_ZOOM);
+    render();
+    startTimer();
+    return;
+  }
+
+  if (event.key === 'n' || event.key === 'N') {
+    newGame();
+  }
+});
 
 // The game is over and the dialog is the way out of it, so Escape must not
 // dismiss it and leave a dead board behind.
