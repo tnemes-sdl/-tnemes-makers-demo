@@ -1,5 +1,5 @@
 import type { City } from './cities';
-import { haversineKm, scoreForDistance } from './geo';
+import { haversineKm, scoreForDistance, speedBonus } from './geo';
 import type { LatLon } from './geo';
 
 export const ROUNDS_PER_GAME = 10;
@@ -33,6 +33,11 @@ export type RoundResult = {
   actual: City;
   /** Distance from the pin, or null if the round ran out of time unanswered. */
   distanceKm: number | null;
+  /** Points for the distance alone, before the speed bonus. */
+  baseScore: number;
+  /** Extra points earned for answering with time to spare. */
+  bonus: number;
+  /** What the round is worth in total: `baseScore + bonus`. */
   score: number;
   timedOut: boolean;
 };
@@ -87,16 +92,24 @@ export function isOver(game: Game): boolean {
  * new guesses. This is the only gate that matters: the map's `locked` class is
  * cosmetic and does not stop a click from arriving.
  */
-export function submitGuess(game: Game, guess: LatLon): RoundResult | null {
+export function submitGuess(
+  game: Game,
+  guess: LatLon,
+  secondsLeft = 0,
+): RoundResult | null {
   const actual = currentTarget(game);
   if (!game.started || actual === null || game.pending !== null) return null;
 
   const distanceKm = haversineKm(guess, { lat: actual.lat, lon: actual.lon });
+  const baseScore = scoreForDistance(distanceKm);
+  const bonus = speedBonus(baseScore, secondsLeft);
   const result: RoundResult = {
     guess,
     actual,
     distanceKm,
-    score: scoreForDistance(distanceKm),
+    baseScore,
+    bonus,
+    score: baseScore + bonus,
     timedOut: false,
   };
   game.pending = result;
@@ -118,6 +131,8 @@ export function timeOutRound(game: Game): RoundResult | null {
     guess: null,
     actual,
     distanceKm: null,
+    baseScore: 0,
+    bonus: 0,
     score: 0,
     timedOut: true,
   };

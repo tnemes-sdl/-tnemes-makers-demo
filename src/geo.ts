@@ -31,3 +31,19 @@ export function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${Math.round(km).toLocaleString('en-US')} km`;
 }
+
+/** Share of a round's points that can be earned back by answering fast. */
+export const SPEED_BONUS_SHARE = 0.2;
+
+/**
+ * Bonus points for a quick answer: a guess placed the instant the city appears is
+ * worth `SPEED_BONUS_SHARE` more than the same guess placed on the buzzer, scaling
+ * linearly with the time left on the clock.
+ */
+export function speedBonus(score: number, secondsLeft: number): number {
+  const ratio = Math.max(0, secondsLeft) / ROUND_SECONDS_FOR_BONUS;
+  return Math.round(score * SPEED_BONUS_SHARE * ratio);
+}
+
+/** The clock a bonus is measured against. */
+const ROUND_SECONDS_FOR_BONUS = 10;

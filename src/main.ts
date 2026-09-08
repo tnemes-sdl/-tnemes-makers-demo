@@ -227,7 +227,8 @@ function showRoundResult(result: RoundResult): void {
   }
 
   resultPointsEl.textContent = result.score.toLocaleString('en-US');
-  resultPointsLabelEl.textContent = result.score === 1 ? 'point' : 'points';
+  resultPointsLabelEl.textContent =
+    result.bonus > 0 ? `points (+${result.bonus} fast)` : result.score === 1 ? 'point' : 'points';
   resultPointsItemEl.dataset.tier = tierFor(result.score);
   resultEl.hidden = false;
 }
@@ -335,7 +336,11 @@ function render(): void {
 }
 
 map.on('click', (event: L.LeafletMouseEvent) => {
-  const result = submitGuess(game, { lat: event.latlng.lat, lon: event.latlng.lng });
+  const result = submitGuess(
+    game,
+    { lat: event.latlng.lat, lon: event.latlng.lng },
+    remainingSeconds(),
+  );
   if (result === null) return; // game over, or this round's result is still showing
 
   stopTimer();
