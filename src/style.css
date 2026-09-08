@@ -341,3 +341,66 @@ button:hover {
     transition: none;
   }
 }
+
+/* --- Personal bests -------------------------------------------------------- */
+
+.stat-value.best {
+  color: var(--muted);
+}
+
+.bests {
+  margin: 0 0 1.25rem;
+  text-align: left;
+}
+
+.bests[hidden] {
+  display: none;
+}
+
+.bests-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bests-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bests-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  border-top: 1px solid rgb(255 255 255 / 7%);
+}
+
+.bests-score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.bests-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.link-button {
+  width: auto;
+  margin-top: 0.6rem;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+}
+
+.link-button:hover {
+  color: var(--panel-fg);
+  background: none;
+}

@@ -4,6 +4,8 @@ import './style.css';
 
 import { CITIES } from './cities';
 import { formatDistance } from './geo';
+import { bestScore, clearScores, loadScores, recordScore } from './scores';
+import type { ScoreEntry } from './scores';
 import {
   ROUNDS_PER_GAME,
   ROUND_SECONDS,
@@ -56,6 +58,13 @@ const summaryMaxEl = el('summary-max');
 const summaryFillEl = el('summary-fill');
 const summaryRatingEl = el('summary-rating');
 const newGameButton = el<HTMLButtonElement>('new-game');
+const bestEl = el('best');
+const bestsEl = el('bests');
+const bestsListEl = el('bests-list');
+const clearBestsButton = el<HTMLButtonElement>('clear-bests');
+
+/** Personal best shown in the header, read once at startup. */
+let best: ScoreEntry | null = bestScore();
 
 // The whole globe is in play: no maxBounds, and minZoom 2 keeps the world visible
 // in one view. Latitude is still clamped to the Mercator limits so the player
@@ -245,6 +254,31 @@ const RATINGS: ReadonlyArray<readonly [number, string]> = [
 const ratingFor = (percent: number): string =>
   RATINGS.find(([floor]) => percent >= floor)?.[1] ?? '';
 
+/** Paints the header's personal-best stat from whatever is in storage. */
+function renderBest(): void {
+  bestEl.textContent = best === null ? '\u2014' : best.score.toLocaleString('en-US');
+}
+
+/** Paints the personal-bests table inside the summary dialog. */
+function renderBests(entries: ScoreEntry[]): void {
+  bestsListEl.replaceChildren();
+
+  for (const item of entries) {
+    const row = document.createElement('li');
+    row.className = 'bests-row';
+    const score = document.createElement('span');
+    score.className = 'bests-score';
+    score.textContent = item.score.toLocaleString('en-US');
+    const meta = document.createElement('span');
+    meta.className = 'bests-meta';
+    meta.textContent = `${item.percent}% \u00b7 ${new Date(item.playedAt).toLocaleDateString()}`;
+    row.append(score, meta);
+    bestsListEl.append(row);
+  }
+
+  bestsEl.hidden = entries.length === 0;
+}
+
 /** Fills in and opens the end-of-game dialog. Safe to call on repeated renders. */
 function showSummary(): void {
   const max = maxScore(game);
@@ -253,6 +287,15 @@ function showSummary(): void {
   summaryPointsEl.textContent = game.totalScore.toLocaleString('en-US');
   summaryMaxEl.textContent = `/ ${max.toLocaleString('en-US')}`;
   summaryRatingEl.textContent = `${percent}% of a perfect game. ${ratingFor(percent)}`;
+
+  const entries = recordScore({
+    score: game.totalScore,
+    percent,
+    playedAt: new Date().toISOString(),
+  });
+  best = entries[0] ?? best;
+  renderBest();
+  renderBests(entries);
 
   if (!summaryEl.open) {
     summaryEl.showModal();
@@ -365,10 +408,18 @@ nextButton.addEventListener('click', () => {
 
 newGameButton.addEventListener('click', newGame);
 
+clearBestsButton.addEventListener('click', () => {
+  clearScores();
+  best = null;
+  renderBest();
+  renderBests(loadScores());
+});
+
 // The game is over and the dialog is the way out of it, so Escape must not
 // dismiss it and leave a dead board behind.
 summaryEl.addEventListener('cancel', (event) => {
   event.preventDefault();
 });
 
+renderBest();
 render();
