@@ -34,6 +34,10 @@
             <span class="stat-label">Total Score</span>
             <span class="stat-value score" id="score">0</span>
           </div>
+          <div class="stat">
+            <span class="stat-label">Personal Best</span>
+            <span class="stat-value best" id="best">&mdash;</span>
+          </div>
           <button id="next" class="is-invisible">Start game</button>
         </div>
       </header>
@@ -52,6 +56,11 @@
           <span class="summary-fill" id="summary-fill"></span>
         </div>
         <p class="summary-rating" id="summary-rating"></p>
+        <section class="bests" id="bests" hidden>
+          <h3 class="bests-title">Personal bests</h3>
+          <ol class="bests-list" id="bests-list"></ol>
+          <button id="clear-bests" class="link-button" type="button">Clear bests</button>
+        </section>
         <button id="new-game" autofocus>New game</button>
       </div>
     </dialog>

@@ -34,6 +34,7 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
 - `src/game.ts` — round/score/timer state, framework-free and testable.
 - `src/geo.ts` — haversine distance and distance-to-score.
 - `src/rating.ts` — end-of-game verdict bands (emoji + wording) by percentage.
+- `src/scores.ts` — personal bests, persisted in `localStorage`.
 - `src/cities.ts` — hardcoded city list of 500 world cities (name, country, lat, lon).
 - `src/*.test.ts` — colocated tests.
 
@@ -88,6 +89,20 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
   `/node_modules/.vite/deps/*.js` until it is rebuilt.
 - The summary's emoji is decorative and `aria-hidden`: the rating sentence beside it
   already states the verdict in words, so announcing both would be a duplicate.
+- Personal bests live in `localStorage` under one key. `scores.ts` takes the
+  `Storage` object as an argument so the tests can pass an in-memory stub instead
+  of touching the browser.
+- Nothing in `scores.ts` may throw. `main.ts` reads the best score during module
+  evaluation, so an exception there aborts the module and leaves a blank page —
+  with the Clear bests control unreachable inside a dialog that never renders.
+  Every `Storage` call is wrapped: reads fall back to an empty table (bad JSON, a
+  value that is not a list, entries without a numeric score), and a failed write
+  costs the saved history rather than the finished game. Storage access itself
+  throws when site data is blocked, not just the `JSON.parse`.
+- `recordScore` sorts *descending* before `slice(0, MAX_SCORES)`, because the
+  slice keeps the head of the list. Sorting the other way silently kept the five
+  worst runs and made `bestScore` report the player's lowest game; assert which
+  scores survive the cap, not just how many.
 - The end-of-game summary is a native `<dialog>` opened with `showModal()` — no
   library, and it gets focus trapping and a `::backdrop` for free. Its `cancel`
   event is suppressed so Escape cannot dismiss it and leave a dead board with no
