@@ -7,6 +7,7 @@ import {
   createGame,
   currentTarget,
   isOver,
+  maxScore,
   pickRandom,
   startGame,
   submitGuess,
@@ -184,6 +185,44 @@ describe('submitGuess', () => {
     }
     expect(isOver(game)).toBe(true);
     expect(submitGuess(game, { lat: 50, lon: 10 })).toBeNull();
+  });
+
+  it('adds the speed bonus to the total, split out from the base score', () => {
+    const game = startedGame();
+    const result = submitGuess(game, { lat: 50, lon: 10 }, ROUND_SECONDS);
+    expect(result?.baseScore).toBe(1000);
+    expect(result?.bonus).toBe(200);
+    expect(result?.score).toBe(1200);
+    expect(game.totalScore).toBe(1200);
+  });
+
+  // The bonus must be measured against this game's clock. If it is measured
+  // against a hardcoded 10 seconds instead, a 20-second round pays 400 here.
+  it('measures the bonus against the configured round length', () => {
+    const game = startedGame(20);
+    const result = submitGuess(game, { lat: 50, lon: 10 }, 20);
+    expect(result?.bonus).toBe(200);
+    expect(result?.score).toBe(1200);
+  });
+});
+
+describe('maxScore', () => {
+  // A perfect game is a bullseye per round *plus* the full bonus, so the summary
+  // can never report more than 100%.
+  it('is the best a game can actually score, bonus included', () => {
+    const game = startedGame();
+    expect(maxScore(game)).toBe(ROUNDS_PER_GAME * 1200);
+
+    for (let i = 0; i < ROUNDS_PER_GAME; i++) {
+      const target = currentTarget(game);
+      submitGuess(game, { lat: target!.lat, lon: target!.lon }, game.secondsPerRound);
+      advanceRound(game);
+    }
+    expect(game.totalScore).toBe(maxScore(game));
+  });
+
+  it('tracks the configured round length', () => {
+    expect(maxScore(startedGame(20))).toBe(ROUNDS_PER_GAME * 1200);
   });
 });
 

@@ -32,7 +32,7 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
   showing the final score and the New game button.
 - `src/main.ts` — game loop and DOM wiring.
 - `src/game.ts` — round/score/timer state, framework-free and testable.
-- `src/geo.ts` — haversine distance and distance-to-score.
+- `src/geo.ts` — haversine distance, distance-to-score, and the speed bonus.
 - `src/cities.ts` — hardcoded city list of 500 world cities (name, country, lat, lon).
 - `src/*.test.ts` — colocated tests.
 
@@ -59,6 +59,14 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
   unit-testable; all rendering lives in `main.ts`. The round clock follows this
   split: `game.ts` owns `ROUND_SECONDS` and `timeOutRound`, while the `setInterval`
   that fires it lives in `main.ts`.
+- A guess earns a speed bonus on top of its distance score: up to
+  `SPEED_BONUS_SHARE` (20%) more, scaling linearly with the seconds left on the
+  clock. `RoundResult` carries `baseScore` and `bonus` alongside the total.
+  `speedBonus` takes the round length as an argument and `submitGuess` passes
+  `game.secondsPerRound` — never a constant, or a `?seconds=20` game pays 40% and a
+  `?seconds=5` game pays 10%. `maxScore` is derived from `MAX_DISTANCE_SCORE` plus a
+  full bonus for the same reason: hardcoding the per-round ceiling makes the summary
+  report over 100% of a "perfect game".
 - Round length is configurable: `ROUND_SECONDS` is the default, `createGame`'s third
   argument overrides it, and `?seconds=20` in the URL sets it without a rebuild.
 - Latitude/longitude order is always `(lat, lon)` — matching Leaflet's `LatLng`.
