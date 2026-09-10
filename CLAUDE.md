@@ -97,5 +97,7 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
   library, and it gets focus trapping and a `::backdrop` for free. Its `cancel`
   event is suppressed so Escape cannot dismiss it and leave a dead board with no
   way to start again.
+- Space and Enter mirror the action button, and N starts a new game. The handler
+  lives on `document` in `main.ts` next to the other listeners.
 - Don't reach for a framework or state library — the game is a handful of modules.
 - `.idea/` is IntelliJ's local config: gitignore it, don't edit it.
