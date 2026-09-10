@@ -238,7 +238,8 @@ function showRoundResult(result: RoundResult): void {
   }
 
   resultPointsEl.textContent = result.score.toLocaleString('en-US');
-  resultPointsLabelEl.textContent = result.score === 1 ? 'point' : 'points';
+  resultPointsLabelEl.textContent =
+    result.bonus > 0 ? `points (+${result.bonus} fast)` : result.score === 1 ? 'point' : 'points';
   resultPointsItemEl.dataset.tier = tierFor(result.score);
   resultEl.hidden = false;
 }
@@ -362,13 +363,19 @@ function render(): void {
     showRoundResult(game.pending);
     nextButton.textContent =
       game.round + 1 >= ROUNDS_PER_GAME ? 'See final score' : 'Next round';
+    hintEl.hidden = false;
+    hintEl.textContent = 'Space for the next round.';
     setNextVisible(true);
     mapEl.classList.add('locked');
   }
 }
 
 map.on('click', (event: L.LeafletMouseEvent) => {
-  const result = submitGuess(game, { lat: event.latlng.lat, lon: event.latlng.lng });
+  const result = submitGuess(
+    game,
+    { lat: event.latlng.lat, lon: event.latlng.lng },
+    remainingSeconds(),
+  );
   if (result === null) return; // game over, or this round's result is still showing
 
   stopTimer();
@@ -403,6 +410,35 @@ clearBestsButton.addEventListener('click', () => {
   best = null;
   renderBest();
   renderBests(loadScores());
+});
+
+/**
+ * Keyboard shortcuts, so a game can be played without reaching for the button
+ * between rounds: Space or Enter does whatever the action button would do, and
+ * N starts a fresh game.
+ */
+document.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key === ' ' || event.key === 'Enter') {
+    if (!game.started) {
+      startGame(game);
+      render();
+      startTimer();
+      return;
+    }
+
+    if (game.pending === null) return; // round still open — the map takes the input
+
+    advanceRound(game);
+    revealLayer.clearLayers();
+    map.setView(WORLD_CENTER, START_ZOOM);
+    render();
+    if (!isOver(game)) startTimer();
+    return;
+  }
+
+  if (event.key === 'n' || event.key === 'N') {
+    newGame();
+  }
 });
 
 // The game is over and the dialog is the way out of it, so Escape must not
