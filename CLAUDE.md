@@ -33,6 +33,7 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
 - `src/main.ts` — game loop and DOM wiring.
 - `src/game.ts` — round/score/timer state, framework-free and testable.
 - `src/geo.ts` — haversine distance and distance-to-score.
+- `src/rating.ts` — end-of-game verdict bands (emoji + wording) by percentage.
 - `src/cities.ts` — hardcoded city list of 500 world cities (name, country, lat, lon).
 - `src/*.test.ts` — colocated tests.
 
@@ -85,6 +86,8 @@ Requires network at runtime for the boundary GeoJSON (one cached fetch, not tile
 - After changing a dependency, restart the dev server with `npm run dev -- --force`.
   Vite's pre-bundled dep cache goes stale and serves 504s for
   `/node_modules/.vite/deps/*.js` until it is rebuilt.
+- The summary's emoji is decorative and `aria-hidden`: the rating sentence beside it
+  already states the verdict in words, so announcing both would be a duplicate.
 - The end-of-game summary is a native `<dialog>` opened with `showModal()` — no
   library, and it gets focus trapping and a `::backdrop` for free. Its `cancel`
   event is suppressed so Escape cannot dismiss it and leave a dead board with no
