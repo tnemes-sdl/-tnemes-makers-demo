@@ -3,10 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Where in the World?</title>
+    <title>Geography games</title>
   </head>
   <body>
-    <div id="app">
+    <div id="select" class="screen">
+      <div class="select-card">
+        <h1>Pick a game</h1>
+        <button id="select-city" class="select-option" type="button">
+          <span class="select-option-title">Where in the World?</span>
+          <span class="select-option-desc">Guess a city's location by clicking the map.</span>
+        </button>
+        <button id="select-country" class="select-option" type="button">
+          <span class="select-option-title">World Country Finder</span>
+          <span class="select-option-desc">Click a named country's shape on the map.</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="app" class="screen" hidden>
       <header class="panel">
         <div class="prompt">
           <span class="round" id="round">Ready</span>
@@ -38,6 +52,7 @@
             <span class="stat-label">Personal Best</span>
             <span class="stat-value best" id="best">&mdash;</span>
           </div>
+          <button id="change-game" class="link-button change-game" type="button">Change game</button>
           <button id="next" class="is-invisible">Start game</button>
         </div>
       </header>
@@ -62,8 +77,86 @@
           <button id="clear-bests" class="link-button" type="button">Clear bests</button>
         </section>
         <button id="new-game" autofocus>New game</button>
+        <button id="summary-change-game" class="link-button" type="button">Change game</button>
       </div>
     </dialog>
+
+    <div id="country-start" class="screen" hidden>
+      <div class="select-card">
+        <h1>World Country Finder</h1>
+        <p class="hint">10 rounds, 10 seconds each. Click the named country's shape on the map.</p>
+
+        <fieldset id="country-difficulty" class="difficulty">
+          <legend>Difficulty</legend>
+          <label><input type="radio" name="difficulty" value="easy" /> Easy</label>
+          <label><input type="radio" name="difficulty" value="medium" checked /> Medium</label>
+          <label><input type="radio" name="difficulty" value="hard" /> Hard</label>
+        </fieldset>
+
+        <p class="hint" id="country-best">Your best on Medium: &mdash;</p>
+
+        <p class="hint" id="country-loading" hidden>Loading country borders&hellip;</p>
+        <div id="country-load-error" hidden>
+          <p class="hint">Could not load country borders.</p>
+          <button id="country-retry" type="button">Retry</button>
+        </div>
+
+        <button id="country-start-button" type="button" disabled>Start game</button>
+        <button id="country-start-back" class="link-button" type="button">Change game</button>
+      </div>
+    </div>
+
+    <div id="country-app" class="screen" hidden>
+      <header class="panel">
+        <div class="prompt">
+          <span class="round" id="country-round">Ready</span>
+          <h1 id="country-prompt">World Country Finder</h1>
+          <p class="hint" id="country-hint">10 rounds, 10 seconds each.</p>
+        </div>
+        <div class="result" id="country-result" hidden>
+          <div class="result-item result-points" id="country-result-item">
+            <span class="result-value" id="country-result-label">Correct</span>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="stat" id="country-timer-stat">
+            <span class="stat-label">Time</span>
+            <span class="stat-value timer" id="country-timer">10s</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Correct</span>
+            <span class="stat-value" id="country-correct">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Incorrect</span>
+            <span class="stat-value" id="country-incorrect">0</span>
+          </div>
+          <button id="country-next" class="is-invisible">Start game</button>
+        </div>
+      </header>
+      <div id="country-map"></div>
+    </div>
+
+    <dialog id="country-summary" class="summary" aria-labelledby="country-summary-title">
+      <div class="summary-card">
+        <p class="summary-emoji" id="country-summary-emoji" aria-hidden="true">🌍</p>
+        <h2 class="summary-title" id="country-summary-title">Game over</h2>
+        <p class="summary-score">
+          <span id="country-summary-correct">0</span
+          ><span class="summary-max" id="country-summary-max">/ 10</span>
+        </p>
+        <p class="summary-rating" id="country-summary-rating"></p>
+        <section class="bests" id="country-bests" hidden>
+          <h3 class="bests-title">Personal bests &mdash; <span id="country-bests-difficulty">Medium</span></h3>
+          <ol class="bests-list" id="country-bests-list"></ol>
+          <button id="country-clear-bests" class="link-button" type="button">Clear bests</button>
+        </section>
+        <button id="country-new-game" autofocus>New game</button>
+        <button id="country-summary-change-game" class="link-button" type="button">Change game</button>
+      </div>
+    </dialog>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

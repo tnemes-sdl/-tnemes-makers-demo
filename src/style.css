@@ -11,15 +11,116 @@
 }
 
 html,
-body,
-#app {
+body {
   height: 100%;
   margin: 0;
 }
 
-#app {
+/* Every top-level view — selection, either game's board, either game's start
+   screen — is one of these, toggled with the `hidden` attribute. Each screen
+   below sets its own `display` via an ID selector so it can lay itself out
+   differently (flex-column board vs. centred card); an ID beats the class+
+   attribute `.screen[hidden]` selector on specificity alone, source order
+   notwithstanding, so hiding needs its own ID+[hidden] override per screen
+   rather than one shared rule. */
+.screen {
+  height: 100%;
+}
+
+#app,
+#country-app {
   display: flex;
   flex-direction: column;
+}
+
+#select[hidden],
+#app[hidden],
+#country-start[hidden],
+#country-app[hidden] {
+  display: none;
+}
+
+/* --- Game selection & a game's own Start screen --------------------------- */
+
+#select,
+#country-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-bg);
+  color: var(--panel-fg);
+}
+
+.select-card {
+  width: min(92vw, 26rem);
+  padding: 2.25rem 2rem;
+  text-align: center;
+}
+
+.select-card h1 {
+  margin: 0 0 1.4rem;
+}
+
+.select-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  margin-bottom: 0.9rem;
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+
+.select-option-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.select-option-desc {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #06121f;
+  opacity: 0.75;
+}
+
+.difficulty {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: 1.2rem 0;
+  padding: 0;
+  border: 0;
+}
+
+.difficulty legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.difficulty label {
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+#country-start .hint {
+  margin-bottom: 0.6rem;
+}
+
+#country-load-error {
+  margin-bottom: 0.6rem;
+}
+
+#country-start-button,
+#country-retry {
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
+.change-game {
+  order: -1;
 }
 
 .panel {
@@ -170,6 +271,14 @@ h1 {
   color: #ff6b6b;
 }
 
+.result-points[data-tier='correct'] .result-value {
+  color: #56d68a;
+}
+
+.result-points[data-tier='incorrect'] .result-value {
+  color: #ff6b6b;
+}
+
 @keyframes result-in {
   from {
     opacity: 0;
@@ -205,6 +314,10 @@ h1 {
   min-width: 10rem;
 }
 
+.side .link-button {
+  min-width: 0;
+}
+
 .is-invisible {
   visibility: hidden;
 }
@@ -224,13 +337,15 @@ button:hover {
   filter: brightness(1.1);
 }
 
-#map {
+#map,
+#country-map {
   flex: 1;
   cursor: crosshair;
   background: #0d1b2a; /* the ocean — there is no basemap behind the borders */
 }
 
-#map.locked {
+#map.locked,
+#country-map.locked {
   cursor: default;
 }
 
